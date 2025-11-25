@@ -1,0 +1,90 @@
+[project]
+name = "example-project"
+version = "0.1.0"
+description = "Example with uv + ruff + ty + pytest"
+requires-python = ">=3.13"
+dependencies = []
+
+# 開発用依存（uv の dependency-groups を使用）
+[dependency-groups]
+dev = ["ruff>=0.6.0", "ty>=0.0.1a22", "pytest>=8.3.0"]
+
+[tool.uv]
+# dev グループをデフォルトで入れる（uv run / uv sync 時）
+default-groups = ["dev"]
+
+########################
+# Ruff (厳しめ設定)
+########################
+
+[tool.ruff]
+line-length = 100
+# 明示しておきたければ
+target-version = "py313"
+
+[tool.ruff.lint]
+# ほぼ全部のルールを有効にしてかなりストイック
+select = ["ALL"]
+
+# さすがにうるさすぎる代表例だけ少し逃がす
+ignore = [
+  "D203",   # D211/D203 が同時に成り立たない系
+  "D213",   # D212/D213 が同時に成り立たない系
+  "T201",   # allow to use print function
+  "COM812", #
+]
+
+[tool.ruff.lint.per-file-ignores]
+# テストは多少ゆるめに（必要に応じて調整）
+"tests/**" = ["D", "S101"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+########################
+#     ty               #
+########################
+
+# どのファイルをチェックするか
+[tool.ty.src]
+include = ["src", "tests"]
+exclude = ["**/node_modules", "**/__pycache__", ".venv", ".git", "dist"]
+respect-ignore-files = true
+
+# Python 3.13 をターゲット
+[tool.ty.environment]
+python-version = "3.13"
+
+# ルール設定（mypy --strict 相当＋αイメージ）
+[tool.ty.rules]
+# まずは「致命的なバグ候補」は全部 error
+unresolved-reference = "error"
+unresolved-import = "error"
+invalid-assignment = "error"
+invalid-argument-type = "error"
+invalid-return-type = "error"
+missing-argument = "error"
+unknown-argument = "error"
+no-matching-overload = "error"
+call-non-callable = "error"
+
+# 便利系（徐々に error に上げてもよい）
+deprecated = "warn"
+redundant-cast = "warn"
+possibly-missing-attribute = "warn"
+
+# どうしてもノイズが多い場合の例（必要になったら追加）
+# division-by-zero         = "ignore"
+
+# CI では warning も失敗扱いにする（かなりストイック）
+[tool.ty.terminal]
+error-on-warning = true
+output-format = "concise"
+
+########################
+# pytest（お好みで）
+########################
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]

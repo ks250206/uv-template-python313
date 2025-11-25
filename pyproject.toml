@@ -2,7 +2,7 @@
 name = "example-project"
 version = "0.1.0"
 description = "Example with uv + ruff + ty + pytest"
-requires-python = ">=3.13"
+requires-python = "==3.13.*"
 dependencies = []
 
 # 開発用依存（uv の dependency-groups を使用）
@@ -37,6 +37,8 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # テストは多少ゆるめに（必要に応じて調整）
 "tests/**" = ["D", "S101"]
+"src/**/*_test.py" = ["D", "S101"]
+"src/**/test_*.py" = ["D", "S101"]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -87,4 +89,4 @@ output-format = "concise"
 
 [tool.pytest.ini_options]
 addopts = "-ra"
-testpaths = ["tests"]
+testpaths = ["tests", "src"]
